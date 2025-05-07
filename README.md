@@ -90,5 +90,5 @@ If I had more time, I would have:
 
 - SLC Images processing documention :
    - https://www.earthdata.nasa.gov/s3fs-public/2024-06/SAR_DataProcessing_1page_new.pdf
-   - Preprocessing https://www.ai4europe.eu/sites/default/files/2023-11/AI4Copernicus_S1SLCPreprocessing.pdf
+   - https://www.ai4europe.eu/sites/default/files/2023-11/AI4Copernicus_S1SLCPreprocessing.pdf
 
