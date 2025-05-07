@@ -1,92 +1,107 @@
 from esa_snappy import ProductIO, GPF, HashMap
 from radar_cs.utils import reproject_geotiff, view_geotiff
 import json
+import os
 
-def preprocess_slc(file_path, ouput_file='outputs/preprocessed_slc'):
-    # Load product
-    p = ProductIO.readProduct(file_path)
+def load_aoi_wkt(geojson_path: str) -> str:
+    """
+    Load an AOI polygon from a GeoJSON file and convert it to WKT format.
+
+    Args:
+        geojson_path (str): Path to the GeoJSON file containing the area of interest.
+
+    Returns:
+        str: WKT string representation of the polygon.
+    """
+    with open(geojson_path, 'r') as file:
+        geojson_data = json.load(file)["features"][0]["geometry"]
+    wkt_coords = ", ".join(f"{coord[0]} {coord[1]}" for coord in geojson_data["coordinates"][0])
+    return f"POLYGON(({wkt_coords}))"
+
+def preprocess_slc(file_path: str, output_file: str = 'outputs/preprocessed_slc', aoi_geojson: str = 'AOI_Rubicon_sent1.geojson') -> None:
+    """
+    Preprocess Sentinel-1 SLC data using SNAP operators:
+    apply orbit file, thermal noise removal, calibration, debursting,
+    speckle filtering, terrain correction, and AOI subset.
+
+    Args:
+        file_path (str): Path to the input Sentinel-1 SLC product (ZIP or SAFE).
+        output_file (str): Base path (without extension) for output products.
+        aoi_geojson (str): Path to GeoJSON defining the subset area.
+    """
+    # Load Sentinel-1 product
+    product = ProductIO.readProduct(file_path)
 
     # Apply orbit file
-    parameters = HashMap()
-    parameters.put('orbitType', 'Sentinel Precise (Auto Download)')
-    parameters.put('polyDegree', '3')
-    parameters.put('continueOnFail', False)
-    p = GPF.createProduct('Apply-Orbit-File', parameters, p)
+    orbit_params = HashMap()
+    orbit_params.put('orbitType', 'Sentinel Precise (Auto Download)')
+    orbit_params.put('polyDegree', '3')
+    orbit_params.put('continueOnFail', False)
+    product = GPF.createProduct('Apply-Orbit-File', orbit_params, product)
 
-    # Thermal noise removal
-    parameters = HashMap()
-    parameters.put('removeThermalNoise', True)
-    parameters.put('outputNoise', False)
-    parameters.put('reintroduceThermalNoise', False)
-    p = GPF.createProduct('ThermalNoiseRemoval', parameters, p)
+    # Remove thermal noise
+    noise_params = HashMap()
+    noise_params.put('removeThermalNoise', True)
+    product = GPF.createProduct('ThermalNoiseRemoval', noise_params, product)
 
-    # Calibration
-    band_names = [band for band in p.getBandNames() if band.endswith('VV') or band.endswith('VH')]
-    source_bands_str = ','.join(band_names)
+    # Calibrate to Sigma0
+    band_names = [b for b in product.getBandNames() if b.endswith('VV') or b.endswith('VH')]
+    calib_params = HashMap()
+    calib_params.put('outputSigmaBand', True)
+    calib_params.put('selectedPolarisations', 'VV,VH')
+    calib_params.put('sourceBands', ','.join(band_names))
+    calib_params.put('outputImageScaleInDb', False)
+    product = GPF.createProduct('Calibration', calib_params, product)
 
-    parameters = HashMap()
-    parameters.put('outputSigmaBand', True)
-    parameters.put('selectedPolarisations', 'VV,VH')
-    parameters.put('sourceBands', source_bands_str)
-    parameters.put('outputImageScaleInDb', False)
-    parameters.put('outputImageInComplex', False)
-    parameters.put('createGammaBand', False)
-    parameters.put('createBetaBand', False)
-    parameters.put('outputBetaBand', False)
-    parameters.put('outputGammaBand', False)
-    p = GPF.createProduct('Calibration', parameters, p)
+    # Deburst IW bursts
+    product = GPF.createProduct('TOPSAR-Deburst', HashMap(), product)
 
-    # Deburst
-    parameters = HashMap()
-    p = GPF.createProduct('TOPSAR-Deburst', parameters, p)
-
-    # Speckle filter
-    parameters = HashMap()
-    parameters.put('filter', 'Refined Lee')
-    parameters.put('filterSizeX', '3')
-    parameters.put('filterSizeY', '3')
-    parameters.put('dampingFactor', '2')
-    parameters.put('estimateENL', True)
-    parameters.put('enl', '1.0')
-    parameters.put('numLooksStr', '1')
-    parameters.put('targetWindowSizeStr', '3x3')
-    parameters.put('sigmaStr', '0.9')
-    parameters.put('anSize', '50')
-    p = GPF.createProduct('Speckle-Filter', parameters, p)
+    # Apply speckle filtering
+    speckle_params = HashMap()
+    speckle_params.put('filter', 'Refined Lee')
+    speckle_params.put('filterSizeX', '3')
+    speckle_params.put('filterSizeY', '3')
+    speckle_params.put('dampingFactor', '2')
+    speckle_params.put('estimateENL', True)
+    speckle_params.put('enl', '1.0')
+    product = GPF.createProduct('Speckle-Filter', speckle_params, product)
 
     # Terrain correction
-    parameters = HashMap()
-    parameters.put('demName', 'Copernicus 30m Global DEM')
-    parameters.put('imgResamplingMethod', 'BILINEAR_INTERPOLATION')
-    parameters.put('pixelSpacingInMeter', '10.0')
-    parameters.put('mapProjection', 'AUTO:42001')
-    parameters.put('nodataValueAtSea', False)
-    parameters.put('saveSelectedSourceBand', True)
-    parameters.put('selectedPolarisations', 'VV,VH')
-    p = GPF.createProduct('Terrain-Correction', parameters, p)
+    terrain_params = HashMap()
+    terrain_params.put('demName', 'Copernicus 30m Global DEM')
+    terrain_params.put('imgResamplingMethod', 'BILINEAR_INTERPOLATION')
+    terrain_params.put('pixelSpacingInMeter', '10.0')
+    terrain_params.put('mapProjection', 'AUTO:42001')
+    terrain_params.put('nodataValueAtSea', False)
+    terrain_params.put('saveSelectedSourceBand', True)
+    terrain_params.put('selectedPolarisations', 'VV,VH')
+    product = GPF.createProduct('Terrain-Correction', terrain_params, product)
 
-    # Subset
-    parameters = HashMap()
-
-    with open('AOI_Rubicon_sent1.geojson', 'r') as file:
-        geojson_data = json.load(file)["features"][0]["geometry"]
+    # Subset to AOI
+    if not os.path.exists(aoi_geojson):
+        raise FileNotFoundError(f"AOI file not found: {aoi_geojson}")
+    aoi_wkt = load_aoi_wkt(aoi_geojson)
 
     subset_params = HashMap()
-    subset_params.put('geoRegion', f'POLYGON(({", ".join([f"{coord[0]} {coord[1]}" for coord in geojson_data["coordinates"][0]])}))')
-    subset = GPF.createProduct('Subset', subset_params, p)
+    subset_params.put('geoRegion', aoi_wkt)
+    subset_product = GPF.createProduct('Subset', subset_params, product)
 
-    write_format = 'BEAM-DIMAP' # in this case write as BEAM-DIMAP
-    ProductIO.writeProduct(subset , output_file, write_format)
-    ProductIO.writeProduct(subset, output_file+'.tif', 'GeoTIFF')
-
-
+    # Write outputs: BEAM-DIMAP and GeoTIFF
+    ProductIO.writeProduct(subset_product, output_file, 'BEAM-DIMAP')
+    ProductIO.writeProduct(subset_product, output_file + '.tif', 'GeoTIFF')
 
 if __name__ == "__main__":
-
+    
     file_path = "data/S1A_IW_SLC__1SDV_20250503T173148_20250503T173215_059033_07527A_2B0C.SAFE.zip"
     output_file = "outputs/preprocessed_slc"
     crs = 'EPSG:3857'
 
-    preprocess_slc(file_path=file_path, ouput_file=output_file)
-    reproject_geotiff(output_file + '.tif', output_file=output_file+'_'+crs+'.tif', target_crs=crs)
-    view_geotiff(input_file=output_file+'_'+crs+'.tif')
+    preprocess_slc(file_path=file_path, output_file=output_file)
+
+    reproject_geotiff(
+        input_file=output_file + '.tif',
+        output_file=output_file + f'_{crs}.tif',
+        target_crs=crs
+    )
+
+    view_geotiff(input_file=output_file + f'_{crs}.tif')
