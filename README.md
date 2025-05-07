@@ -3,7 +3,7 @@ Second case study on sentinel-1 radar
 
 **Radar Sentinel-1 Preprocessing & Visualization Toolkit**
 
-Radar_cs is a Python package which provides tools for preprocessing Sentinel-1 Synthetic Aperture Radar (SAR) data and visualizing key radar backscatter components (VV, VH, VV/VH ratio). It uses the ESA SNAP `snappy` interface and additional utilities to handle reprojection, rescaling, and image generation.
+Radar_cs is a Python package which provides tools for preprocessing Sentinel-1 Synthetic Aperture Radar (SAR) data and visualizing key radar backscatter components (VV, VH, VV/VH ratio). It uses the ESA SNAP `esa_snappy` interface and additional utilities to handle reprojection, rescaling, and image generation.
 
 ---
 
@@ -19,13 +19,14 @@ Radar_cs is a Python package which provides tools for preprocessing Sentinel-1 S
 ## 🛠 Requirements
 
 - Python 3.10
+- SNAP (v10)
 - [esa-snappy](https://step.esa.int/main/toolboxes/snap/)  
 - numpy  
 - matplotlib  
 - rasterio  
 - GDAL (for reprojection)
 
-Make sure SNAP (Sentinel Application Platform) is installed and `snappy` is configured correctly.
+Make sure SNAP (Sentinel Application Platform) is installed and `esa_snappy` is configured correctly.
 
 ---
 
@@ -33,6 +34,7 @@ Make sure SNAP (Sentinel Application Platform) is installed and `snappy` is conf
 
 ```bash
 python src/radar_cs/main.py
+```
 
 This will:
 
