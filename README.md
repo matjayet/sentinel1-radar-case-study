@@ -84,7 +84,7 @@ If I had more time, I would have:
 - [ESA SNAP (Sentinel Application Platform)](https://step.esa.int/main/toolboxes/snap/)  
   The official platform for processing and analyzing Sentinel-1, Sentinel-2, and other Earth Observation data.
 - [Pyenv installation](https://github.com/pyenv/pyenv?tab=readme-ov-file)
-- [Install python build dependencies] (https://github.com/pyenv/pyenv/wiki#suggested-build-environment)
+- [Install python build dependencies](https://github.com/pyenv/pyenv/wiki#suggested-build-environment)
 - [Tutorial to install and use snap with Python](https://senbox.atlassian.net/wiki/spaces/SNAP/pages/19300362/How+to+use+the+SNAP+API+from+Python)
 - [Link to input example on copernicus hub](https://browser.dataspace.copernicus.eu/?zoom=8&lat=45.773&lng=7.33956&themeId=MONITORING&visualizationUrl=U2FsdGVkX1%2FzK44xhqmSHnCy4Qkufk1FyTJjW9Iug5QHc0VAr9oRwvAPl3%2BUcDhJlHDp9ZNB82SfLTQuAlQ7CR%2Fjtb6BLqCT5PE3f89mu7TbARPTkZKoz0%2FUydVdaiVo&datasetId=S2_L2A_CDAS)
 
