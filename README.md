@@ -78,3 +78,17 @@ If I had more time, I would have:
 - **Explored the individual processing steps more deeply**: I would dive deeper into each SNAP operator and process to understand their behavior in greater detail. This would allow me to determine the most appropriate operators for different use cases, optimizing the pipeline depending on the user's specific objectives.
 
 - **Developed a user interface**: I would create a user-friendly interface, similar to SNAP, allowing users to interact with the pipeline more easily. This could include a graphical user interface (GUI) where users can select input files, choose processing steps, define outputs, and view results interactively without needing to modify the code directly. Streamlit would be a good choice for a rapid solution but there might be problems integrating snap and esa_snappy
+
+### 📚 References
+
+- [ESA SNAP (Sentinel Application Platform)](https://step.esa.int/main/toolboxes/snap/)  
+  The official platform for processing and analyzing Sentinel-1, Sentinel-2, and other Earth Observation data.
+- [Pyenv installation](https://github.com/pyenv/pyenv?tab=readme-ov-file)
+- [Install python build dependencies] (https://github.com/pyenv/pyenv/wiki#suggested-build-environment)
+- [Tutorial to install and use snap with Python](https://senbox.atlassian.net/wiki/spaces/SNAP/pages/19300362/How+to+use+the+SNAP+API+from+Python)
+- [Link to input example on copernicus hub](https://browser.dataspace.copernicus.eu/?zoom=8&lat=45.773&lng=7.33956&themeId=MONITORING&visualizationUrl=U2FsdGVkX1%2FzK44xhqmSHnCy4Qkufk1FyTJjW9Iug5QHc0VAr9oRwvAPl3%2BUcDhJlHDp9ZNB82SfLTQuAlQ7CR%2Fjtb6BLqCT5PE3f89mu7TbARPTkZKoz0%2FUydVdaiVo&datasetId=S2_L2A_CDAS)
+
+- SLC Images processing documention :
+   - https://www.earthdata.nasa.gov/s3fs-public/2024-06/SAR_DataProcessing_1page_new.pdf
+   - Preprocessing https://www.ai4europe.eu/sites/default/files/2023-11/AI4Copernicus_S1SLCPreprocessing.pdf
+
