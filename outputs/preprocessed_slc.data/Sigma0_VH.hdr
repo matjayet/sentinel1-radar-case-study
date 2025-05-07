@@ -1,0 +1,15 @@
+ENVI
+description = {Sentinel-1 IW Level-1 SLC Product - Unit: intensity}
+samples = 746
+lines = 506
+bands = 1
+header offset = 0
+file type = ENVI Standard
+data type = 4
+interleave = bsq
+byte order = 1
+band names = { Sigma0_VH }
+map info = {UTM,374.5,254.5,719819.0754402918,5076213.6454526475,10.0,10.0,84,North,WGS84,units=Meters}
+coordinate system string = {PROJCS["WGS 84 / Auto UTM", GEOGCS["WGS84(DD)", DATUM["WGS84", SPHEROID["WGS84", 6378137.0, 298.257223563]], PRIMEM["Greenwich", 0.0], UNIT["degree", 0.017453292519943295], AXIS["Geodetic longitude", EAST], AXIS["Geodetic latitude", NORTH], AUTHORITY["EPSG","4326"]], PROJECTION["Transverse_Mercator"], PARAMETER["central_meridian", 3.0], PARAMETER["latitude_of_origin", 0.0], PARAMETER["scale_factor", 0.9996], PARAMETER["false_easting", 500000.0], PARAMETER["false_northing", 0.0], UNIT["m", 1.0], AXIS["Easting", EAST], AXIS["Northing", NORTH]]}
+data gain values = {1.0}
+data offset values = {0.0}
